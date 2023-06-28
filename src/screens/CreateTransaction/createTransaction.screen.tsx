@@ -24,6 +24,7 @@ import {
 } from "firebase/database";
 import { useGetQuoteQuery } from "../../redux/quotes.service";
 import { auth, db } from "../../utils/firebase";
+import { scheduleNotificationAsync } from "expo-notifications";
 
 const CreateTransaction = () => {
   const {
@@ -106,6 +107,21 @@ const CreateTransaction = () => {
 
   const { refetch, data, isLoading } = useGetQuoteQuery(undefined);
 
+  const sendNotification = async () => {
+    console.log(amountValues.expInc);
+    scheduleNotificationAsync({
+      content: {
+        title: "Transaction processed successfully",
+        body: `Amount ${
+          amountValues.expInc === "income" ? "inserted " : "withdrawn"
+        } $${amountValues.amount}`,
+      },
+      trigger: {
+        seconds: 2,
+      },
+    });
+  };
+
   return (
     <SafeAreaView>
       <Header />
@@ -132,6 +148,7 @@ const CreateTransaction = () => {
             onPress={() => {
               createTransactionRealtimeDB();
               refetch();
+              sendNotification();
               Alert.alert(
                 "Transaction added",
                 `${data != undefined ? data[0].q : ""}\n\n${
