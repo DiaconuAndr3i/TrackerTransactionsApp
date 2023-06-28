@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
-import { SafeAreaView, View } from "react-native";
+import { Animated, Easing, SafeAreaView, View } from "react-native";
 import { RootStackParamList } from "../../navigation/navigator.types";
 import { useThemeConsumer } from "../../utils/theme/theme.consumer";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -50,6 +50,20 @@ const Register = ({ navigation }: RegisterProps) => {
   const clearError = () => {
     setError("");
   };
+
+  const spinValue = new Animated.Value(0);
+
+  Animated.timing(spinValue, {
+    toValue: 1,
+    duration: 2000,
+    easing: Easing.cubic,
+    useNativeDriver: true,
+  }).start();
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
   return (
     <SafeAreaView style={styles.authContainer}>
@@ -105,10 +119,15 @@ const Register = ({ navigation }: RegisterProps) => {
         <Text>OR</Text>
         <View style={styles.orContainerLine} />
       </View>
-      <View style={styles.trackerTransactionsContainer}>
+      <Animated.View
+        style={[
+          styles.trackerTransactionsContainer,
+          { transform: [{ rotate: spin }] },
+        ]}
+      >
         <Text sx={styles.trackerTransactions}>Tracker</Text>
         <Text sx={styles.trackerTransactions}>Transactions</Text>
-      </View>
+      </Animated.View>
       <View style={styles.newAccount}>
         <Text>Do you already have an account?</Text>
         <Text

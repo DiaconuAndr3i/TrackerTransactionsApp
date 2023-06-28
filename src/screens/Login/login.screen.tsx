@@ -1,6 +1,12 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
-import { SafeAreaView, View } from "react-native";
+import {
+  SafeAreaView,
+  View,
+  Animated,
+  useAnimatedValue,
+  Easing,
+} from "react-native";
 import { RootStackParamList } from "../../navigation/navigator.types";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../utils/firebase";
@@ -37,6 +43,20 @@ const Login = ({ navigation }: LoginProps) => {
   } = useThemeConsumer();
 
   const styles = loginStyles(colors);
+
+  const spinValue = new Animated.Value(0);
+
+  Animated.timing(spinValue, {
+    toValue: 1,
+    duration: 2000,
+    easing: Easing.cubic,
+    useNativeDriver: true,
+  }).start();
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
   return (
     <SafeAreaView style={styles.authContainer}>
@@ -76,10 +96,15 @@ const Login = ({ navigation }: LoginProps) => {
         <Text>OR</Text>
         <View style={styles.orContainerLine} />
       </View>
-      <View style={styles.trackerTransactionsContainer}>
+      <Animated.View
+        style={[
+          styles.trackerTransactionsContainer,
+          { transform: [{ rotate: spin }] },
+        ]}
+      >
         <Text sx={styles.trackerTransactions}>Tracker</Text>
         <Text sx={styles.trackerTransactions}>Transactions</Text>
-      </View>
+      </Animated.View>
       <View style={styles.newAccount}>
         <Text>Dont you have an account?</Text>
         <Text
